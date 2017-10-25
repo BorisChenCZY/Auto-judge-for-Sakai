@@ -9,7 +9,7 @@ current_path = os.getcwd()
 END_NAME = '/提交作业的附件/'
 
 def check_folder(student_name):
-	FORBIDDEN = ('DS_Store', 'py', 'code', 'judge', ".md")
+	FORBIDDEN = ('DS_Store', 'py', 'code', 'judge', ".md", "git")
 	NECESSARY = ('.java')
 	for item in FORBIDDEN:
 		if item in student_name:
@@ -103,7 +103,8 @@ def judge_file(file_path, judge_dict, select_dict):
 				print('\terror: cannot found class name of .java file', real_path + real_path[real_path.rfind('/'):])
 
 			with open('./{}.java'.format(class_name), 'w') as f:
-				f.write(content)
+                # print(content)
+				f.write(content.encode('utf-8').decode('utf-8'))
 			os.system('javac ./{}.java'.format(class_name))
 			test_file = select_test_file(class_name + real_path, select_dict)
 			if not test_file:
@@ -129,9 +130,8 @@ def judge_file(file_path, judge_dict, select_dict):
 	return error
 			
 def select_test_file(path, select_dict):
-	pattern = re.compile("117[0-9]+")
+	pattern = re.compile("11[0-9]+")
 	path = re.sub(pattern, "", path)
-	
 	for key in select_dict.keys():
 		if key.upper() in path.upper():
 			return select_dict[key]
@@ -202,10 +202,12 @@ def p_quit(success):
 def failiure_print():
 	print("--------------------------------------")
 	print("Something went wront! Go check the error info.")
+
 def success_print():
 	print("--------------------------------------")
 	print("The auto-judge has finished.")
 	print("You may check the result.md and error.md in ./judge")
+	
 if __name__ == "__main__":
 	student_names = filter(lambda x: not "py" in x, os.listdir(current_path))
 	zip_files = {}
