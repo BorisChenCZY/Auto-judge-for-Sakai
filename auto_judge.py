@@ -161,9 +161,10 @@ def load_judge_profile(select_dict):
 	
 	with open('./judge/judge.profile', 'r') as f:
 		content = f.read()
-	lines = content.split()
+	lines = content.split('\n')
+#	print(lines)
 	for line in lines:
-		if line == "" and line == None:
+		if line == "" or line == None:
 			continue
 		keys, values = line.split(":")
 		values = values.strip()
