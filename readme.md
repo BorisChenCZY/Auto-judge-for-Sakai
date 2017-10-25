@@ -57,3 +57,4 @@ __.cpp__ support.
 
 __You can freely modify this program, BUT YOU WILL DISPLAY the origin author, which is me, in your program.__
 
+Star if you like it!
