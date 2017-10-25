@@ -1,4 +1,4 @@
-# Auto-judge sakai homework
+# Auto-judge Sakai homework
 
 This program is used to judge sakai homework to save time for TAs and Student Assistents.
 
@@ -16,6 +16,7 @@ You need to install (python packages)
 - rarfile
 - shutil
 - patoolib
+
 to run this program.
 
 All unix system like __macOS__, __Linux__ can run this program.
