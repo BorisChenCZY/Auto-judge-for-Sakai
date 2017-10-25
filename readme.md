@@ -14,8 +14,7 @@ This program is written in __python3.6__, python 2 is not tested.
 
 You need to install (python packages)
 - rarfile
-- shutil
-- patoolib
+- patool
 
 to run this program.
 
