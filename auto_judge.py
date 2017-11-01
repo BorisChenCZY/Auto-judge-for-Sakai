@@ -82,7 +82,7 @@ def unzip_compressed_files(zip_files, file_path):
 def judge_file(file_path, judge_dict, select_dict):
 	error = ''
 	package_pattern = re.compile("package.*?;")
-	class_name_pattern = re.compile("public class ([a-zA-Z0-9_]+) {")
+	class_name_pattern = re.compile("public class ([a-zA-Z0-9_]+)[ \t{]*")
 	os.chdir('./judge')
 	for name, paths in file_path.items():
 		print('judging', name)
@@ -162,7 +162,7 @@ def load_judge_profile(select_dict):
 	with open('./judge/judge.profile', 'r') as f:
 		content = f.read()
 	lines = content.split('\n')
-#	print(lines)
+
 	for line in lines:
 		if line == "" or line == None:
 			continue
@@ -170,6 +170,9 @@ def load_judge_profile(select_dict):
 		values = values.strip()
 		for key in keys.split(' '):
 			if key == "":
+				continue
+			if key == 'IGNORE':
+				select_dict['IGNORE'] = values.split(' ')
 				continue
 			if key not in select_dict.keys():
 				select_dict[key] = values
@@ -179,8 +182,15 @@ def load_judge_profile(select_dict):
 	check_test_file(select_dict)
 
 def check_test_file(select_dict):
-	for values in select_dict.values():
+	ignore_items = select_dict['IGNORE']
+	patterns = [re.compile(item) for item in ignore_items ]
+	for key, values in select_dict.items():
+		if key == "IGNORE":
+			continue
 		for value in values.split(" "):
+			for pattern in patterns:
+				value = re.sub(pattern, "", value)
+			print(value)
 			if value == "" and value == None:
 				continue
 			if not os.path.isfile('./judge/' + value):
@@ -197,7 +207,7 @@ def p_quit(success):
 	print("Programmed by Boris, 11510237@mail.sustc.edu.cn")
 	print("Thanks for using!")
 	print("--------------------------------------")
-	print("Ver. 0.1")
+	print("Ver. 0.2")
 	quit()
 	
 def failiure_print():
