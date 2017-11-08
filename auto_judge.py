@@ -79,6 +79,56 @@ def unzip_compressed_files(zip_files, file_path):
 	for key in (file_path.keys()):
 		print (key)
 
+def compile_file(paths, file_info, package_pattern, class_name_pattern):
+	print("reformating...")
+	for path in paths:
+		# compile
+		real_path = path.replace('/提交作业的附件', "")
+		print("\t", real_path)
+		with open(real_path, 'rb') as f:
+			try:
+				content = (f.read().decode('gbk'))
+			except UnicodeDecodeError:
+				content = (f.read().decode('utf-8'))
+		content = (re.sub(package_pattern, "", content))
+		try:
+			class_name = re.findall(class_name_pattern, content)[0]
+		except IndexError:
+			error += real_path + '\n'
+			print('\terror: cannot found class name of .java file', real_path + real_path[real_path.rfind('/'):])
+
+		with open('./{}.java'.format(class_name), 'w') as f:
+			f.write(content.encode('utf-8').decode('utf-8'))
+		
+		file_info[class_name + real_path] = class_name
+	
+def run_file(file_info, select_dict, student_name):
+	#run
+	print('testing...')
+	for check_words, class_name in file_info.items():
+		print("\t", class_name)
+		os.system('javac ./{}.java'.format(class_name))
+		test_file = select_test_file(check_words, select_dict)
+		if not test_file:
+			error += real_path + '\n'
+			print('\terror: cannot find a match test file in ./judge/judge.profile', real_path + real_path[real_path.rfind('/'):])
+			continue
+		for single_test_file in test_file.split(' '):
+			if single_test_file != '' and single_test_file != None:
+				pass
+
+			pipe = os.popen('java {} < ./{}'.format(class_name, single_test_file))
+			result = pipe.read()
+			pipe.close()
+			if student_name in judge_dict.keys():
+				judge_dict[student_name] += test_file + '\t: ' + result + '\n'
+			else:
+				judge_dict[student_name] = test_file + '\t: ' + result + '\n'
+			
+			return error
+#			print(test)
+#			quit()
+
 def judge_file(file_path, judge_dict, select_dict):
 	error = ''
 	package_pattern = re.compile("package.*?;")
@@ -86,47 +136,10 @@ def judge_file(file_path, judge_dict, select_dict):
 	os.chdir('./judge')
 	for name, paths in file_path.items():
 		print('judging', name)
-		for path in paths:
-			real_path = path.replace('/提交作业的附件', "")
-			print("\t", real_path)
-			with open(real_path, 'rb') as f:
-				try:
-					content = (f.read().decode('gbk'))
-				except UnicodeDecodeError:
-					content = (f.read().decode('utf-8'))
-#			print(content)
-			content = (re.sub(package_pattern, "", content))
-			try:
-				class_name = re.findall(class_name_pattern, content)[0]
-			except IndexError:
-				error += real_path + '\n'
-				print('\terror: cannot found class name of .java file', real_path + real_path[real_path.rfind('/'):])
-
-			with open('./{}.java'.format(class_name), 'w') as f:
-                # print(content)
-				f.write(content.encode('utf-8').decode('utf-8'))
-			os.system('javac ./{}.java'.format(class_name))
-			test_file = select_test_file(class_name + real_path, select_dict)
-			if not test_file:
-				error += real_path + '\n'
-				print('\terror: cannot find a match test file in ./judge/judge.profile', real_path + real_path[real_path.rfind('/'):])
-				continue
+		file_info = {}
+		compile_file(paths, file_info, package_pattern, class_name_pattern)
+		error += run_file(file_info, select_dict, name)
 			
-			for single_test_file in test_file.split(' '):
-				if single_test_file != '' and single_test_file != None:
-					pass
-
-				test = os.system('java {} < ./{} >tmp.result'.format(class_name, single_test_file))
-				with open('tmp.result', 'r') as f:
-					result = f.read()
-				if result == None:
-					result = ""
-				if test_file == None:
-					test_file = class_name
-				if name in judge_dict.keys():
-					judge_dict[name] += test_file + '\t: ' + result + '\n'
-				else:
-					judge_dict[name] = test_file + '\t: ' + result + '\n'
 	return error
 			
 def select_test_file(path, select_dict):
@@ -182,8 +195,10 @@ def load_judge_profile(select_dict):
 	check_test_file(select_dict)
 
 def check_test_file(select_dict):
-	ignore_items = select_dict['IGNORE']
-	patterns = [re.compile(item) for item in ignore_items ]
+	patterns = r''
+	if 'IGNORE' in select_dict.keys():
+		ignore_items = select_dict['IGNORE']
+		patterns = [re.compile(item) for item in ignore_items ]
 	for key, values in select_dict.items():
 		if key == "IGNORE":
 			continue
@@ -205,9 +220,7 @@ def p_quit(success):
 		failiure_print()
 	print("--------------------------------------")
 	print("Programmed by Boris, 11510237@mail.sustc.edu.cn")
-	print("Thanks for using!")
-	print("--------------------------------------")
-	print("Ver. 0.2")
+	print("Ver. 0.3")
 	quit()
 	
 def failiure_print():
