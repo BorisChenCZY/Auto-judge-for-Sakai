@@ -105,6 +105,7 @@ def compile_file(paths, file_info, package_pattern, class_name_pattern):
 def run_file(file_info, select_dict, student_name):
 	#run
 	print('testing...')
+	error = ""
 	for check_words, class_name in file_info.items():
 		print("\t", class_name)
 		os.system('javac ./{}.java'.format(class_name))
@@ -125,7 +126,7 @@ def run_file(file_info, select_dict, student_name):
 			else:
 				judge_dict[student_name] = test_file + '\t: ' + result + '\n'
 			
-			return error
+	return error
 #			print(test)
 #			quit()
 
@@ -224,8 +225,7 @@ def p_quit(success):
 	quit()
 	
 def failiure_print():
-	print("--------------------------------------")
-	print("Something went wront! Go check the error info.")
+	pass
 
 def success_print():
 	print("--------------------------------------")
