@@ -7,7 +7,7 @@ import re
 import patoolib
 import subprocess
 
-VERSION = 0.5
+VERSION = 0.6
 current_path = os.getcwd()
 END_NAME = '/提交作业的附件/'
 
