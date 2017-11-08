@@ -132,8 +132,9 @@ def run_file(file_info, select_dict, student_name):
         for single_test_file in test_file.split(' '):
             if single_test_file != '' and single_test_file != None:
                 (out, err) = pipe('java {} < ./{}'.format(class_name, single_test_file))
-                if (err!= b""):
+                if (err!= b"" and out == b""):
                     error += " compile error:" + real_path + '\n'
+                    print(err.decode('utf-8'))
                 else:
                     result = out.decode("utf-8")
                     if student_name in judge_dict.keys():
