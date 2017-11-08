@@ -3,6 +3,7 @@ public class Homework4 {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		234fhjkdasl;
 		Scanner in = new Scanner(System.in);
 		System.out.print("Enter the number of minutes£º");
 		long a= in.nextLong();
