@@ -120,7 +120,9 @@ def run_file(file_info, select_dict, student_name):
     error = ""
     for class_name, real_path in file_info.items():
         print("\t", class_name)
-        os.system('javac ./{}.java'.format(class_name))
+        result, err = pipe('javac ./{}.java'.format(class_name))
+        if err != b"":
+            error += "runtime error: {}\n".format(real_path) 
         test_file = select_test_file(class_name, select_dict)
         if not test_file:
             error += real_path + '\n'
@@ -129,8 +131,7 @@ def run_file(file_info, select_dict, student_name):
             continue
         for single_test_file in test_file.split(' '):
             if single_test_file != '' and single_test_file != None:
-                proc = subprocess.Popen(['java {} < ./{}'.format(class_name, single_test_file)], stdout=subprocess.PIPE, shell=True, stderr = subprocess.PIPE)
-                (out, err) = proc.communicate()
+                (out, err) = pipe('java {} < ./{}'.format(class_name, single_test_file))
                 if (err!= b""):
                     error += " compile error:" + real_path + '\n'
                 else:
@@ -139,16 +140,12 @@ def run_file(file_info, select_dict, student_name):
                     	judge_dict[student_name] += test_file + '\t: ' + result + '\n'
                     else:
                     	judge_dict[student_name] = test_file + '\t: ' + result + '\n'
-                
-                
-#                print("out:", out)
 
-
-#                print("err:", err)
-#                print(proc)
-#    quit()
-
-    return error  # print(test)
+    return error
+    
+def pipe(command):
+    proc = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True, stderr = subprocess.PIPE)
+    return proc.communicate()
 
 def judge_file(file_path, judge_dict, select_dict):
     error = ''
